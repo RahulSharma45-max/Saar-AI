@@ -83,10 +83,12 @@ function App() {
     formData.append('summaryLength', summaryLength);
 
     try {
-      const response = await fetch('http://localhost:8080/api/documents/process', {
-        method: 'POST',
-        body: formData,
-      });
+      const API_URL = import.meta.env.VITE_API_URL;
+
+const response = await fetch(`${API_URL}/api/documents/process`, {
+  method: 'POST',
+  body: formData,
+});
 
       const data = await response.json();
 
@@ -106,17 +108,14 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <span className="brand-mark">
-          <span>Saar</span>
-          <span>AI</span>
-        </span>
+        <span className="brand-mark">S-AI</span>
         <span className="brand-name">SaarAI</span>
       </header>
 
       <section className="hero">
-        <h1 className="hero-title">SaarAI turns documents into clear insights.</h1>
+        <h1 className="hero-title">Turn documents into clear insights.</h1>
         <p className="hero-subtitle">
-          Upload a PDF or scanned image and let SaarAI generate a summary,
+          Upload a PDF or scanned image and get an AI-generated summary,
           key points, and improvement suggestions.
         </p>
       </section>
