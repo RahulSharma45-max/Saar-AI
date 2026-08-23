@@ -1,0 +1,52 @@
+:root {
+  /* Colors */
+  --color-primary: #13A8FF;
+  --color-secondary: #F1F5F9;
+  --color-accent: #AA71FF;
+  --color-background: #F1F5F9;
+  --color-surface: #27272A;
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-border: #27272A;
+
+  /* Typography */
+  --font-display: 'Chewy', cursive;
+  --font-body: 'Patrick Hand', sans-serif;
+  --font-label: 'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --space-base: 8px;
+  --space-gap: 16px;
+  --space-card-padding: 24px;
+  --space-section-padding: 80px;
+
+  /* Radius */
+  --radius-card: 4px;
+  --radius-control: 12px;
+  --radius-pill: 9999px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
