@@ -1,5 +1,6 @@
 package com.documentsummary.backend.controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import com.documentsummary.backend.service.AiSummaryService;
 import com.documentsummary.backend.service.OcrService;
 import com.documentsummary.backend.service.PdfExtractionService;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = "https://saar-ai-frontend.vercel.app")
 @RestController
 public class DocumentController {
 
