@@ -1,16 +1,67 @@
-# React + Vite
+# SaarAI — Frontend Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend client for **SaarAI** is an enterprise-grade dark SaaS dashboard engineered with React 19, Vite, and Lucide React. It provides real-time document analysis, multi-step progress indicators, interactive charts, and rich tabbed document readers.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Three-Section Dashboard Layout:**
+  - **Left Sidebar:** Workspace navigation, engine status badge, and mobile drawer.
+  - **Main Content:** Header with search & notifications, 4 KPI statistic cards, drag-and-drop upload, activity analytics chart, and recent documents.
+  - **Right Assistant Panel:** Live status indicators, AI capabilities, and processing telemetry.
+- **Document Ingestion:**
+  - Drag-and-drop or file picker for PDFs, PNG, JPG, and JPEG files.
+  - Client-side validation for file format and 10 MB size limits.
+  - Segmented summary length selector (`Short`, `Medium`, `Long`).
+- **Interactive Document Analysis View:**
+  - Executive summary presentation with reading time and word count.
+  - Numbered key insight cards with copy actions.
+  - Categorized improvement suggestions.
+  - Dark editor reader with in-text search, highlight matching, line numbers, and plain-text export.
+- **Persisted History:**
+  - Automatically stores analyzed documents in `localStorage` for instant review.
+- **Responsive Design:**
+  - Full support across desktop (1440px/1280px), tablet (1024px), and mobile (768px/375px).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Framework:** [React 19](https://react.dev/)
+- **Bundler & Tooling:** [Vite](https://vite.dev/)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Typography:** Inter & JetBrains Mono (Google Fonts)
+- **Styling:** Custom Vanilla CSS Design System with CSS variables
+
+---
+
+## Getting Started
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure Environment
+
+Create a `.env` file in the `frontend` root:
+
+```env
+VITE_API_URL=http://localhost:8080
+```
+
+> In production (e.g. Vercel), set `VITE_API_URL` to your Render backend API URL.
+
+### 3. Run Development Server
+
+```bash
+npm run dev
+```
+
+### 4. Build for Production
+
+```bash
+npm run build
+```

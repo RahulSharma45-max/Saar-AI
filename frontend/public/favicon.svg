@@ -1,5 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="32" fill="#27272A" />
-  <text x="32" y="27" text-anchor="middle" font-family="monospace" font-size="15" font-weight="700" fill="#13A8FF">Saar</text>
-  <text x="32" y="43" text-anchor="middle" font-family="monospace" font-size="15" font-weight="700" fill="#13A8FF">AI</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="saarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#151B21" />
+  <rect x="2" y="2" width="60" height="60" rx="14" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <!-- Document silhouette -->
+  <path d="M20 16H36L44 24V48H20V16Z" fill="#202A32" stroke="url(#saarGrad)" stroke-width="2.5" stroke-linejoin="round" />
+  <path d="M36 16V24H44" stroke="url(#saarGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- AI Sparkle mark -->
+  <path d="M30 32C30 35 28 37 25 37C28 37 30 39 30 42C30 39 32 37 35 37C32 37 30 35 30 32Z" fill="url(#accentGrad)" />
+  <!-- Document lines -->
+  <line x1="26" y1="28" x2="38" y2="28" stroke="#A0A8B2" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+  <line x1="26" y1="44" x2="38" y2="44" stroke="#A0A8B2" stroke-width="2" stroke-linecap="round" opacity="0.6" />
 </svg>
