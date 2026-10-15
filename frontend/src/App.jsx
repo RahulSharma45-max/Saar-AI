@@ -99,6 +99,9 @@ function App() {
   const [summaryLength, setSummaryLength] = useState('MEDIUM');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processError, setProcessError] = useState(null);
+  // Carries the machine-readable error classification returned by the backend
+  // (e.g. 'GEMINI_OVERLOAD'). Stays in sync with processError.
+  const [processErrorCode, setProcessErrorCode] = useState(null);
   const [result, setResult] = useState(null);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
 
@@ -153,6 +156,7 @@ function App() {
 
     setErrorMessage(null);
     setProcessError(null);
+    setProcessErrorCode(null);
 
     const fileNameLower = file.name ? file.name.toLowerCase() : '';
     const isAllowedExt = fileNameLower.endsWith('.pdf') || 
@@ -205,6 +209,7 @@ function App() {
     setSelectedFile(null);
     setErrorMessage(null);
     setProcessError(null);
+    setProcessErrorCode(null);
   };
 
   const handleProcessDocument = async () => {
@@ -229,6 +234,11 @@ function App() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Read the machine-readable errorCode if the backend provided one.
+        // Only tag GEMINI_OVERLOAD when the backend explicitly says so;
+        // other 503s and unrelated server errors keep a null code.
+        const errorCode = data.errorCode === 'GEMINI_OVERLOAD' ? 'GEMINI_OVERLOAD' : null;
+        setProcessErrorCode(errorCode);
         setProcessError(data.error || 'The server returned an error while processing the document. Please try again.');
         return;
       }
@@ -260,6 +270,8 @@ function App() {
       }, 150);
 
     } catch (err) {
+      // Network-level failure — no errorCode applies here.
+      setProcessErrorCode(null);
       setProcessError('Could not process the document. Please check your network connection and verify that the backend API is online.');
     } finally {
       setIsProcessing(false);
@@ -302,8 +314,12 @@ function App() {
           {processError && (
             <ErrorState
               error={processError}
+              errorCode={processErrorCode}
               onRetry={handleProcessDocument}
-              onDismiss={() => setProcessError(null)}
+              onDismiss={() => {
+                setProcessError(null);
+                setProcessErrorCode(null);
+              }}
             />
           )}
 
