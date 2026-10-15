@@ -6,10 +6,24 @@ import {
   X, 
   Sparkles, 
   AlertCircle,
-  FileCheck
+  FileCheck,
+  FolderOpen,
+  ArrowRight
 } from 'lucide-react';
 import SummarySelector from './SummarySelector';
 
+/**
+ * UploadCard Component
+ * Follows section 3 specification:
+ * - A large, centered white card below the header
+ * - A. Upload heading: "Upload Your Document" with document/upload icon
+ * - B. File upload area: Drag-and-drop zone with document upload icon,
+ *      "Drag and drop your file here", "or click to browse files",
+ *      "Choose File" button, display selected file's name, type, size,
+ *      and clear option to remove or replace.
+ * - C. Full-width primary submit button labeled "Process Document",
+ *      styled with blue-to-purple gradient, disabled when no file is selected.
+ */
 export default function UploadCard({
   selectedFile,
   isDragging,
@@ -39,26 +53,39 @@ export default function UploadCard({
     }
   };
 
-  const isPdf = selectedFile?.type === 'application/pdf';
-  const isImage = selectedFile?.type?.startsWith('image/');
+  const isPdf = selectedFile?.name?.toLowerCase().endsWith('.pdf') || selectedFile?.type === 'application/pdf';
+  const isImage = selectedFile?.type?.startsWith('image/') || /\.(png|jpe?g)$/i.test(selectedFile?.name || '');
 
   return (
-    <div className="card analyze-card" id="analyze-section">
-      <div className="card-header-block">
-        <div className="title-with-badge">
-          <h2 className="card-title">Analyze Your Document</h2>
-          <span className="ai-pill">
-            <Sparkles size={12} className="ai-pill-icon" /> AI Powered
-          </span>
+    <div className="card upload-card-main" id="upload-section">
+      {/* A. Upload heading */}
+      <div className="upload-heading-wrapper">
+        <div className="upload-heading-icon-circle" aria-hidden="true">
+          <UploadCloud size={20} className="upload-heading-icon" />
         </div>
-        <p className="card-subtitle">
-          Upload a document and let SaarAI extract, summarize and analyze it.
-        </p>
+        <div className="upload-heading-text">
+          <h2 className="upload-card-title">Upload Your Document</h2>
+          <p className="upload-card-subtitle">
+            Select a PDF document or image for instant automated summarization and extraction
+          </p>
+        </div>
       </div>
 
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        id="document-file-input"
+        accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+        onChange={handleInputChange}
+        className="hidden-file-input"
+        aria-label="Choose a file to upload"
+      />
+
+      {/* B. File upload area */}
       {!selectedFile ? (
         <div
-          className={`dropzone-area ${isDragging ? 'dragging' : ''}`}
+          className={`upload-dropzone ${isDragging ? 'is-dragging' : ''}`}
           onDrop={onDrop}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
@@ -71,132 +98,117 @@ export default function UploadCard({
               handleBrowseClick();
             }
           }}
-          aria-label="Upload document by dragging a file here or clicking to browse"
+          aria-label="Upload document: drag and drop your file here or click to browse files"
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
-            onChange={handleInputChange}
-            className="hidden-file-input"
-            aria-label="Choose a file to upload"
-          />
-
-          <div className="dropzone-icon-circle">
-            <UploadCloud size={38} strokeWidth={1.8} className="dropzone-main-icon" />
+          <div className="dropzone-icon-bubble">
+            <UploadCloud size={36} strokeWidth={1.8} className="dropzone-svg-icon" />
           </div>
 
-          <div className="dropzone-text-group">
-            <p className="dropzone-primary-text">
-              <span className="highlight-text">Drop your document here</span> or browse files
-            </p>
-            <p className="dropzone-secondary-text">
-              PDF, PNG, JPG or JPEG • Max 10 MB
-            </p>
+          <div className="dropzone-text-block">
+            <p className="dropzone-main-text">Drag and drop your file here</p>
+            <p className="dropzone-sub-text">or click to browse files</p>
           </div>
 
-          <div className="dropzone-action">
-            <button 
-              type="button" 
-              className="btn btn-secondary btn-browse"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleBrowseClick();
-              }}
-            >
-              Choose Document
-            </button>
-          </div>
+          <button 
+            type="button" 
+            className="btn btn-choose-file"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleBrowseClick();
+            }}
+          >
+            <FolderOpen size={16} />
+            <span>Choose File</span>
+          </button>
 
-          <div className="dropzone-footer-pills">
-            <span className="format-tag">Apache PDFBox</span>
-            <span className="format-tag">Tesseract OCR</span>
-            <span className="format-tag">Gemini 2.0</span>
+          <div className="dropzone-supported-pill">
+            <span>Supports PDF, PNG, JPG, JPEG (Max 10 MB)</span>
           </div>
         </div>
       ) : (
-        <div className="selected-file-wrapper">
+        <div className="selected-file-container">
           <div className="selected-file-card">
-            <div className="file-avatar-box">
+            <div className="file-icon-box">
               {isPdf ? (
-                <FileText size={28} className="file-icon-pdf" />
+                <FileText size={26} className="file-icon-pdf" />
               ) : isImage ? (
-                <ImageIcon size={28} className="file-icon-img" />
+                <ImageIcon size={26} className="file-icon-img" />
               ) : (
-                <FileCheck size={28} className="file-icon-default" />
+                <FileCheck size={26} className="file-icon-default" />
               )}
             </div>
 
-            <div className="file-details">
-              <div className="file-name-row">
-                <h4 className="file-name" title={selectedFile.name}>{selectedFile.name}</h4>
-                <span className="file-type-pill">
-                  {isPdf ? 'PDF Document' : 'Scanned Image / OCR'}
+            <div className="file-meta-column">
+              <div className="file-title-row">
+                <span className="selected-file-name" title={selectedFile.name}>
+                  {selectedFile.name}
+                </span>
+                <span className="file-badge-type">
+                  {isPdf ? 'PDF' : isImage ? 'Image • OCR' : 'Document'}
                 </span>
               </div>
-              <p className="file-size-text">
-                {formatFileSize(selectedFile.size)} • Ready for AI extraction
-              </p>
+              <div className="file-specs-row">
+                <span className="file-size-tag">{formatFileSize(selectedFile.size)}</span>
+                <span className="file-specs-dot">•</span>
+                <span className="file-ready-text">Ready to process</span>
+              </div>
             </div>
 
-            <button
-              type="button"
-              className="file-remove-btn"
-              onClick={onRemoveFile}
-              disabled={isProcessing}
-              title="Remove file"
-              aria-label="Remove selected file"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <div className="upload-controls-grid">
-            <SummarySelector 
-              value={summaryLength} 
-              onChange={onSummaryLengthChange} 
-              disabled={isProcessing}
-            />
-
-            <div className="action-row">
+            <div className="file-actions-group">
               <button
                 type="button"
-                className="btn btn-primary btn-analyze"
-                onClick={onProcess}
+                className="btn btn-replace-file"
+                onClick={handleBrowseClick}
                 disabled={isProcessing}
+                title="Replace with another file"
               >
-                {isProcessing ? (
-                  <>
-                    <span className="spinner-loader" aria-hidden="true" />
-                    <span>Analyzing Document...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={18} />
-                    <span>Generate AI Analysis</span>
-                  </>
-                )}
+                Replace
               </button>
-
               <button
                 type="button"
-                className="btn btn-ghost"
+                className="btn-remove-file"
                 onClick={onRemoveFile}
                 disabled={isProcessing}
+                title="Remove selected file"
+                aria-label="Remove selected file"
               >
-                Choose Different File
+                <X size={18} />
               </button>
             </div>
           </div>
+
+          {/* Summary Length Preference */}
+          <SummarySelector 
+            value={summaryLength} 
+            onChange={onSummaryLengthChange} 
+            disabled={isProcessing}
+          />
         </div>
       )}
 
+      {/* Validation Error Banner */}
       {validationError && (
         <div className="validation-error-banner" role="alert">
           <AlertCircle size={18} className="error-icon" />
           <span>{validationError}</span>
         </div>
       )}
+
+      {/* C. Submit button: Full-width primary button labeled "Process Document" */}
+      <div className="submit-button-container">
+        <button
+          type="button"
+          id="process-document-btn"
+          className="btn btn-process-document"
+          onClick={onProcess}
+          disabled={!selectedFile || isProcessing}
+          aria-busy={isProcessing}
+        >
+          <Sparkles size={18} />
+          <span>Process Document</span>
+          <ArrowRight size={18} className="btn-arrow-icon" />
+        </button>
+      </div>
     </div>
   );
 }

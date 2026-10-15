@@ -1,50 +1,70 @@
 /* ==========================================================================
-   SaarAI — Modern Dark SaaS Design System
+   SaarAI — Modern Clean Minimal Design System
+   Color Palette & Foundation:
+   - Main background: Very light blue (#EEF4FF)
+   - Card background: White (#FFFFFF)
+   - Primary accent: Soft blue (#8AAAF7)
+   - Secondary accent: Lavender purple (#B68AF5)
+   - Gradient buttons: linear-gradient(90deg, #8AAAF7, #C084FC)
+   - Primary text: Dark charcoal (#263238)
+   - Secondary text: Muted gray (#64748B)
+   - Borders: Soft gray (#E2E8F0)
+   - Success accent: Soft green (#D1FAE5)
    ========================================================================== */
 
 :root {
-  /* Color Palette - Dark Blue-Gray / Charcoal */
-  --bg-app: #12171E;
-  --bg-main: #151B21;
-  --bg-sidebar: #1A222A;
-  --bg-card: #202A32;
-  --bg-card-alt: #242E36;
-  --bg-card-hover: #29343E;
-  --bg-input: #171E25;
-  --bg-overlay: rgba(15, 20, 26, 0.82);
+  /* Core Color Palette */
+  --bg-app: #EEF4FF;
+  --bg-main: #EEF4FF;
+  --bg-card: #FFFFFF;
+  --bg-card-alt: #F8FAFC;
+  --bg-card-hover: #F1F5F9;
+  --bg-input: #FFFFFF;
+  --bg-zone: #F5F7FD;
+  --bg-zone-hover: #EDF2FE;
+  --bg-overlay: rgba(15, 23, 42, 0.45);
 
   /* Typography Colors */
-  --text-primary: #FFFFFF;
-  --text-secondary: #A0A8B2;
-  --text-muted: #64748B;
-  --text-accent: #818CF8;
+  --text-primary: #263238;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  --text-accent: #6366F1;
+  --text-purple: #8B5CF6;
 
   /* Accent Colors */
-  --accent-indigo: #6366F1;
-  --accent-purple: #7C3AED;
-  --accent-blue: #3B82F6;
-  --accent-cyan: #06B6D4;
-  --accent-pink: #EC4899;
-  --accent-success: #22C55E;
-  --accent-warning: #F59E0B;
-  --accent-error: #EF4444;
+  --accent-primary: #8AAAF7;
+  --accent-secondary: #B68AF5;
+  --accent-purple-end: #C084FC;
+  --accent-success-bg: #D1FAE5;
+  --accent-success-text: #065F46;
+  --accent-success-border: #A7F3D0;
+  --accent-error-bg: #FEE2E2;
+  --accent-error-text: #991B1B;
+  --accent-error-border: #FECACA;
+  --accent-warning-bg: #FEF3C7;
+  --accent-warning-text: #92400E;
 
   /* Gradients */
-  --grad-primary: linear-gradient(135deg, #6366F1 0%, #7C3AED 100%);
-  --grad-accent: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
-  --grad-emerald: linear-gradient(135deg, #10B981 0%, #059669 100%);
-  --grad-glow: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  --grad-primary: linear-gradient(90deg, #8AAAF7 0%, #C084FC 100%);
+  --grad-primary-hover: linear-gradient(90deg, #7899EA 0%, #B074EC 100%);
+  --grad-subtle-pill: linear-gradient(135deg, rgba(138, 170, 247, 0.12) 0%, rgba(182, 138, 245, 0.12) 100%);
+  --grad-header-text: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
 
   /* Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-light: rgba(255, 255, 255, 0.14);
-  --border-active: rgba(99, 102, 241, 0.45);
+  --border-subtle: #E2E8F0;
+  --border-light: #CBD5E1;
+  --border-dashed: #CBD5E1;
+  --border-active: #8AAAF7;
+  --border-purple: #B68AF5;
 
   /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 10px 30px -4px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.22);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 6px -1px rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 16px -2px rgba(138, 170, 247, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 32px -4px rgba(100, 116, 139, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 24px 48px -8px rgba(15, 23, 42, 0.22), 0 12px 24px -6px rgba(138, 170, 247, 0.18);
+  --shadow-btn: 0 4px 14px 0 rgba(138, 170, 247, 0.35);
+  --shadow-btn-hover: 0 6px 20px 0 rgba(192, 132, 252, 0.42);
 
   /* Radii */
   --radius-xs: 6px;
@@ -72,7 +92,7 @@
 }
 
 html, body {
-  height: 100%;
+  min-height: 100%;
   width: 100%;
   background-color: var(--bg-main);
   color: var(--text-primary);
@@ -86,26 +106,26 @@ html, body {
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-main);
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2D3944;
+  background: #CBD5E1;
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3B4B59;
+  background: #94A3B8;
 }
 
 /* Focus styles */
 :focus-visible {
-  outline: 2px solid var(--accent-indigo);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 

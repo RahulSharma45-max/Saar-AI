@@ -1,30 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Icons
-import { 
-  FileText, 
-  Sparkles, 
-  Lightbulb, 
-  ShieldCheck,
-  CheckCircle2,
-  Clock,
-  ExternalLink
-} from 'lucide-react';
-
 // Components
-import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import StatCard from './components/StatCard';
 import UploadCard from './components/UploadCard';
-import ActivityChart from './components/ActivityChart';
-import RecentDocuments from './components/RecentDocuments';
-import AssistantPanel from './components/AssistantPanel';
 import DocumentResult from './components/DocumentResult';
-import LoadingState from './components/LoadingState';
+import ProcessingOverlay from './components/ProcessingOverlay';
 import ErrorState from './components/ErrorState';
+import RecentDocuments from './components/RecentDocuments';
 
-// Default initial demo documents to demonstrate the UI immediately
+// Initial demo documents for immediate reference / exploration
 const INITIAL_DEMO_DOCS = [
   {
     id: 'demo-1',
@@ -115,11 +100,7 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processError, setProcessError] = useState(null);
   const [result, setResult] = useState(null);
-
-  // Navigation & UI state
-  const [activeNav, setActiveNav] = useState('dashboard');
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
 
   // Persistent Recent Documents
   const [recentDocs, setRecentDocs] = useState(() => {
@@ -134,7 +115,23 @@ function App() {
     return INITIAL_DEMO_DOCS;
   });
 
-  // Save recent docs to localStorage whenever they update
+  // Track processing elapsed seconds
+  useEffect(() => {
+    let interval = null;
+    if (isProcessing) {
+      setSecondsElapsed(0);
+      interval = setInterval(() => {
+        setSecondsElapsed((prev) => prev + 1);
+      }, 1000);
+    } else {
+      setSecondsElapsed(0);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isProcessing]);
+
+  // Save recent docs to localStorage
   useEffect(() => {
     try {
       localStorage.setItem('saarai_recent_documents', JSON.stringify(recentDocs));
@@ -176,6 +173,7 @@ function App() {
     }
 
     setSelectedFile(file);
+    // Keep any previous result or clear? Per prompt: "Initially, hide the results section or display it only when appropriate. After successful processing, render the actual result below upload section."
     setResult(null);
   };
 
@@ -210,7 +208,7 @@ function App() {
   };
 
   const handleProcessDocument = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || isProcessing) return;
 
     setIsProcessing(true);
     setProcessError(null);
@@ -235,7 +233,7 @@ function App() {
         return;
       }
 
-      // Successful analysis
+      // Successful analysis result
       setResult(data);
 
       // Add to recent documents
@@ -253,6 +251,14 @@ function App() {
 
       setRecentDocs(prev => [newDocEntry, ...prev.filter(d => d.fileName !== newDocEntry.fileName)]);
 
+      // Scroll to result smoothly
+      setTimeout(() => {
+        const resultSection = document.getElementById('results-section');
+        if (resultSection) {
+          resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
+
     } catch (err) {
       setProcessError('Could not process the document. Please check your network connection and verify that the backend API is online.');
     } finally {
@@ -263,148 +269,88 @@ function App() {
   const handleSelectRecentDoc = (doc) => {
     if (doc.data) {
       setResult(doc.data);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  const handleBackToUpload = () => {
-    setResult(null);
-    setSelectedFile(null);
-    setErrorMessage(null);
-    setProcessError(null);
-  };
-
-  const handleNavChange = (navId) => {
-    setActiveNav(navId);
-    if (navId === 'upload') {
-      setResult(null);
-      const analyzeElement = document.getElementById('analyze-section');
-      if (analyzeElement) {
-        analyzeElement.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else if (navId === 'documents' || navId === 'history') {
-      const recentElement = document.getElementById('recent-docs-section');
-      if (recentElement) {
-        recentElement.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else if (navId === 'dashboard') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        const resultSection = document.getElementById('results-section');
+        if (resultSection) {
+          resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
   };
 
   return (
-    <div className="app-container">
-      <div className="dashboard-layout">
-        {/* Left Sidebar */}
-        <Sidebar
-          activeNav={activeNav}
-          onNavChange={handleNavChange}
-          isMobileOpen={isMobileSidebarOpen}
-          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+    <div className="app-viewport">
+      {/* 
+        4. Processing Animation — Important:
+        Full-screen processing overlay blocking mouse & keyboard interaction
+        Active for the entire duration of the actual document-processing request.
+      */}
+      {isProcessing && (
+        <ProcessingOverlay 
+          fileName={selectedFile?.name}
+          secondsElapsed={secondsElapsed}
         />
+      )}
 
-        {/* Center Main Content Area */}
-        <div className="main-content-column">
-          <Header
-            onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            activeView={activeNav}
+      {/* Main Single-Column Clean Container */}
+      <div className="app-centered-container">
+        {/* 2. Header with existing project name 'SaarAI' */}
+        <Header />
+
+        <main className="main-content-flow">
+          {/* Error Banner if processing failed */}
+          {processError && (
+            <ErrorState
+              error={processError}
+              onRetry={handleProcessDocument}
+              onDismiss={() => setProcessError(null)}
+            />
+          )}
+
+          {/* 3. Main Upload Section & Process Document button */}
+          <UploadCard
+            selectedFile={selectedFile}
+            isDragging={isDragging}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onFileSelect={handleFileChosen}
+            onRemoveFile={handleRemoveFile}
+            summaryLength={summaryLength}
+            onSummaryLengthChange={setSummaryLength}
+            onProcess={handleProcessDocument}
+            isProcessing={isProcessing}
+            validationError={errorMessage}
+            formatFileSize={formatFileSize}
           />
 
-          <main className="dashboard-scroll-body">
-            {/* If analysis result is available, show the DocumentResult view */}
-            {result && !result.error ? (
-              <DocumentResult
-                result={result}
-                onBackToUpload={handleBackToUpload}
-              />
-            ) : (
-              <>
-                {/* 4 Statistics Cards */}
-                <section className="stats-grid" aria-label="Workspace Metrics">
-                  <StatCard
-                    title="Documents Processed"
-                    value="128"
-                    icon={FileText}
-                    trend="+12.5%"
-                    trendLabel="vs last month"
-                    color="indigo"
-                  />
-                  <StatCard
-                    title="Summaries Generated"
-                    value="96"
-                    icon={Sparkles}
-                    trend="+8.2%"
-                    trendLabel="vs last month"
-                    color="blue"
-                  />
-                  <StatCard
-                    title="Key Insights"
-                    value="342"
-                    icon={Lightbulb}
-                    trend="+24.1%"
-                    trendLabel="synthesized"
-                    color="amber"
-                  />
-                  <StatCard
-                    title="Success Rate"
-                    value="98.4%"
-                    icon={ShieldCheck}
-                    trend="+0.6%"
-                    trendLabel="system uptime"
-                    color="emerald"
-                  />
-                </section>
+          {/* 
+            5. Results Section:
+            Rendered below the upload section and submit button after successful processing.
+          */}
+          {result && !result.error && (
+            <DocumentResult
+              result={result}
+              onBackToUpload={() => {
+                setSelectedFile(null);
+                setResult(null);
+              }}
+            />
+          )}
 
-                {/* Loading state when processing */}
-                {isProcessing && (
-                  <LoadingState fileName={selectedFile?.name} />
-                )}
+          {/* Recent documents library below results */}
+          <RecentDocuments
+            documents={recentDocs}
+            onSelectDocument={handleSelectRecentDoc}
+          />
+        </main>
 
-                {/* Error Banner if process failed */}
-                {processError && (
-                  <ErrorState
-                    error={processError}
-                    onRetry={handleProcessDocument}
-                    onDismiss={() => setProcessError(null)}
-                  />
-                )}
-
-                {/* Main Feature: Analyze Your Document Card */}
-                {!isProcessing && (
-                  <UploadCard
-                    selectedFile={selectedFile}
-                    isDragging={isDragging}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onFileSelect={handleFileChosen}
-                    onRemoveFile={handleRemoveFile}
-                    summaryLength={summaryLength}
-                    onSummaryLengthChange={setSummaryLength}
-                    onProcess={handleProcessDocument}
-                    isProcessing={isProcessing}
-                    validationError={errorMessage}
-                    formatFileSize={formatFileSize}
-                  />
-                )}
-
-                {/* Document Activity Chart */}
-                <ActivityChart />
-
-                {/* Recent Documents */}
-                <RecentDocuments
-                  documents={recentDocs}
-                  onSelectDocument={handleSelectRecentDoc}
-                />
-              </>
-            )}
-          </main>
-        </div>
-
-        {/* Right Assistant Information Panel */}
-        <AssistantPanel />
+        {/* Minimal Footer */}
+        <footer className="saar-footer">
+          <p className="footer-text">
+            SaarAI Document Processing • Powered by Apache PDFBox, Tess4J OCR & Gemini
+          </p>
+        </footer>
       </div>
     </div>
   );
